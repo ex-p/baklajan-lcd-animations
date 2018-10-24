@@ -45,22 +45,33 @@ test = [
 ]
 
 
-def generate_outer(rows, cols, left_len, accent_color, bg_color, speed=1):
+def generate_outer(rows, cols, left_len, right_len, ac_color, bg_color):
     grid = np.zeros((rows, cols, 3), dtype=int)
-    grid[:, :] = np.array(bg_color)
-    stages = left_len // speed + (left_len % speed != 0)
-    for stage in range(stages):
-        # left_size =
+    for stage in range(left_len):
+        grid[:, :] = np.array(bg_color)
+        edge = int(round((stage + 1) / left_len * right_len))
+        for row in range(rows):
+            for i in range(stage + 1):
+                idx = left_len - 1 - i
+                grid[row][idx] = ac_color
+            for i in range(edge):
+                idx = left_len + i
+                grid[row][idx] = ac_color
         yield grid
 
 
 def main():
     rows = 3
-    cols = 492
-    left_len = 300
+
+    # be aware left len >= right len
+    left_len = 16  # 300
+    right_len = 8  # 192
+
+    cols = left_len + right_len
+
     purple = [94, 0, 211]
     green = [0, 255, 0]
-    gen = generate_outer(rows, cols, left_len, green, purple)
+    gen = generate_outer(rows, cols, left_len, right_len, green, purple)
     for stage, grid in enumerate(gen):
         save(grid, left_len, 'outer', stage)
 
